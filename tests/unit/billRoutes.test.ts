@@ -4,6 +4,8 @@
  * so no database, network or real login is used.
  */
 
+import type { NextRequest } from 'next/server';
+
 const mockRequireRole = jest.fn();
 const mockGetById = jest.fn();
 const mockCreateBillWithFee = jest.fn();
@@ -25,7 +27,10 @@ import { POST as payBill } from '@/app/api/bills/[id]/pay/route';
 
 // Minimal fake request: only the parts the routes use
 const fakeReq = (body: unknown) =>
-  ({ json: async () => body, cookies: { get: () => undefined } }) as any;
+  ({
+    json: async () => body,
+    cookies: { get: () => undefined },
+  }) as unknown as NextRequest;
 
 const params = (id: string) => ({ params: Promise.resolve({ id }) });
 
