@@ -2,15 +2,15 @@
     "name": "clinic-app",
     "version": "0.1.0",
     "private": true,
-   "scripts": {
-  "dev": "next dev",
-  "build": "next build",
-  "start": "next start",
-  "lint": "eslint",
-  "test": "jest --coverage",
-  "test:coverage": "jest --coverage",
-  "test:e2e": "jest --config jest.e2e.config.js"
-},
+    "scripts": {
+        "dev": "next dev",
+        "build": "next build",
+        "start": "next start",
+        "lint": "eslint",
+        "test": "jest --coverage",
+        "test:coverage": "jest --coverage",
+        "test:e2e": "jest --config jest.e2e.config.js"
+    },
     "dependencies": {
         "bcryptjs": "^3.0.3",
         "firebase-admin": "^13.10.0",
