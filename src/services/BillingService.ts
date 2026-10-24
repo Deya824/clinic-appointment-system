@@ -1,0 +1,82 @@
+/**
+ * BillingService — create bills and process payments.
+ * Uses DiscountStrategy (Strategy pattern) to compute discounts.
+ * Uses PaymentGateway (Adapter pattern) for payment processing.
+ */
+
+import type { IBillRepository, IPatientRepository, IDoctorRepository } from '@/repositories/interfaces';
+import type { Bill } from '@/types';
+import type { PaymentGateway } from '@/patterns/payments/PaymentGateway';
+import { getDiscount } from '@/patterns/billing/DiscountStrategy';
+
+export class BillingService {
+  constructor(
+    private bills:    IBillRepository,
+    private patients: IPatientRepository,
+    private doctors:  IDoctorRepository,
+    private gateway:  PaymentGateway
+  ) {}
+
+  /** Create a bill for an appointment, applying the correct discount strategy. */
+  async createBill(appointmentId: string, patientId: string): Promise<Bill> {
+    // Guard: no duplicate bill for same appointment
+    const existing = await this.bills.findByAppointment(appointmentId);
+    if (existing) throw new Error('BILL_EXISTS');
+
+    const patient = await this.patients.findById(patientId);
+    if (!patient) throw new Error('PATIENT_NOT_FOUND');
+
+    // Fetch the doctor to get consultation fee
+    // We need doctorId from the appointment — caller must pass it, or we look it up.
+    // For simplicity, we derive fee from patientId context via patient type only.
+    // The route passes doctorId separately; we accept fee as a parameter from the route.
+    throw new Error('USE_createBillWithFee'); // callers should use createBillWithFee
+  }
+
+  /** Create a bill with an explicit fee (fee comes from DoctorService). */
+  async createBillWithFee(
+    appointmentId: string,
+    patientId: string,
+    fee: number
+  ): Promise<Bill> {
+    if (fee < 0) throw new Error('NEGATIVE_FEE');
+
+    const existing = await this.bills.findByAppointment(appointmentId);
+    if (existing) throw new Error('BILL_EXISTS');
+
+    const patient = await this.patients.findById(patientId);
+    if (!patient) throw new Error('PATIENT_NOT_FOUND');
+
+    // Strategy pattern: pick discount based on patient type
+    const strategy = getDiscount(patient.patientType);
+    const discount  = strategy.calculate(fee);
+    const amount    = fee - discount;
+
+    return this.bills.create({
+      appointmentId,
+      patientId,
+      amount,
+      discount,
+      paymentStatus: 'unpaid',
+    });
+  }
+
+  /** Process a payment through the gateway; mark bill paid on success. */
+  async pay(billId: string, amount: number): Promise<Bill> {
+    const bill = await this.bills.findById(billId);
+    if (!bill) throw new Error('BILL_NOT_FOUND');
+    if (bill.paymentStatus === 'paid') throw new Error('ALREADY_PAID');
+    if (amount <= 0) throw new Error('INVALID_AMOUNT');
+
+    const result = await this.gateway.charge(amount, billId);
+    if (!result.success) throw new Error('PAYMENT_FAILED');
+
+    return this.bills.markPaid(billId, result.transactionId);
+  }
+
+  async getBill(billId: string): Promise<Bill> {
+    const bill = await this.bills.findById(billId);
+    if (!bill) throw new Error('BILL_NOT_FOUND');
+    return bill;
+  }
+}
