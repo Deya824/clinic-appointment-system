@@ -42,3 +42,6 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 docs/PROJECT_NOTES.md
+docs/PROGRESS.md
+docs/evidence/
+test-output*.txt
