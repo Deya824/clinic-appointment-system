@@ -77,7 +77,10 @@ export class AppointmentService {
     return updated;
   }
 
-  async reschedule(id: string, input: UpdateAppointmentInput): Promise<Appointment> {
+  async reschedule(
+  id: string,
+  input: Pick<UpdateAppointmentInput, 'start' | 'end'>
+): Promise<Appointment> {
     const appt = await this.appointments.findById(id);
     if (!appt) throw new Error('NOT_FOUND');
     if (appt.status === 'cancelled') throw new Error('ALREADY_CANCELLED');

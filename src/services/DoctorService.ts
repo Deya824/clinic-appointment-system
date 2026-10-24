@@ -4,11 +4,11 @@
 
 import type { IDoctorRepository, IScheduleRepository } from '@/repositories/interfaces';
 import type { Doctor, Schedule } from '@/types';
-import type { CreateDoctorInput, CreateScheduleSchema } from '@/schemas';
+import type { CreateDoctorInput } from '@/schemas';
 import { z } from 'zod';
-import { CreateScheduleSchema as ScheduleSchema } from '@/schemas';
+import { CreateScheduleSchema } from '@/schemas';
 
-type CreateScheduleInput = z.infer<typeof ScheduleSchema>;
+type CreateScheduleInput = z.infer<typeof CreateScheduleSchema>;
 
 export class DoctorService {
   constructor(
@@ -37,6 +37,9 @@ export class DoctorService {
 
   async addSchedule(input: CreateScheduleInput): Promise<Schedule> {
     if (input.startTime >= input.endTime) throw new Error('INVALID_SCHEDULE_TIME');
-    return this.schedules.create(input);
+   return this.schedules.create({
+  ...input,
+  dayOfWeek: input.dayOfWeek as Schedule['dayOfWeek'],
+});
   }
 }

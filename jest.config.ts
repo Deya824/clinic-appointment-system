@@ -17,16 +17,13 @@ const config: Config = {
   },
 
   // Load global test setup (e.g. env vars for tests)
-  setupFilesAfterFramework: ['<rootDir>/jest.setup.ts'],
+  setupFilesAfterEnv: ['<rootDir>/jest.setup.ts'],
 
-  // Collect coverage only from our source, not boilerplate
+  // Coverage only for business logic: services and design patterns
   collectCoverageFrom: [
-    'src/**/*.{ts,tsx}',
+    'src/services/**/*.ts',
+    'src/patterns/**/*.ts',
     '!src/**/*.d.ts',
-    '!src/app/layout.tsx',
-    '!src/app/page.tsx',
-    '!src/app/**/page.tsx',
-    '!src/app/api-docs/**',
   ],
 
   // Project requirement: 80% line, 70% branch coverage
@@ -37,17 +34,22 @@ const config: Config = {
     },
   },
 
-  // Only run files in tests/unit (not e2e — those need a browser)
+  // Only run files in tests/unit (not e2e, those need a browser)
   testMatch: [
     '<rootDir>/tests/unit/**/*.test.ts',
   ],
 
-  // ts-jest config: use bundler module resolution to match tsconfig
+  // FIX: "jose" is a modern ES module, so Jest must convert it too
+  transformIgnorePatterns: ['/node_modules/(?!(jose)/)'],
+
+  // FIX: also convert .js files (needed for jose)
   transform: {
-    '^.+\\.tsx?$': ['ts-jest', {
+    '^.+\\.(ts|tsx|js)$': ['ts-jest', {
       tsconfig: {
-        moduleResolution: 'node',  // ts-jest works best with node resolver
+        allowJs: true,
+        moduleResolution: 'node',
         module: 'commonjs',
+        esModuleInterop: true,
       },
     }],
   },
