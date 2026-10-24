@@ -4,11 +4,11 @@
 
 import type { IDoctorRepository, IScheduleRepository } from '@/repositories/interfaces';
 import type { Doctor, Schedule } from '@/types';
-import type { CreateDoctorInput, CreateScheduleSchema } from '@/schemas';
+import type { CreateDoctorInput } from '@/schemas';
 import { z } from 'zod';
-import { CreateScheduleSchema as ScheduleSchema } from '@/schemas';
+import { CreateScheduleSchema } from '@/schemas';
 
-type CreateScheduleInput = z.infer<typeof ScheduleSchema>;
+type CreateScheduleInput = z.infer<typeof CreateScheduleSchema>;
 
 export class DoctorService {
   constructor(

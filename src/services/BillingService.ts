@@ -4,7 +4,7 @@
  * Uses PaymentGateway (Adapter pattern) for payment processing.
  */
 
-import type { IBillRepository, IPatientRepository, IDoctorRepository } from '@/repositories/interfaces';
+import type { IBillRepository, IPatientRepository } from '@/repositories/interfaces';
 import type { Bill } from '@/types';
 import type { PaymentGateway } from '@/patterns/payments/PaymentGateway';
 import { getDiscount } from '@/patterns/billing/DiscountStrategy';
@@ -13,27 +13,14 @@ export class BillingService {
   constructor(
     private bills:    IBillRepository,
     private patients: IPatientRepository,
-    private doctors:  IDoctorRepository,
     private gateway:  PaymentGateway
   ) {}
 
-  /** Create a bill for an appointment, applying the correct discount strategy. */
-  async createBill(appointmentId: string, patientId: string): Promise<Bill> {
-    // Guard: no duplicate bill for same appointment
-    const existing = await this.bills.findByAppointment(appointmentId);
-    if (existing) throw new Error('BILL_EXISTS');
-
-    const patient = await this.patients.findById(patientId);
-    if (!patient) throw new Error('PATIENT_NOT_FOUND');
-
-    // Fetch the doctor to get consultation fee
-    // We need doctorId from the appointment — caller must pass it, or we look it up.
-    // For simplicity, we derive fee from patientId context via patient type only.
-    // The route passes doctorId separately; we accept fee as a parameter from the route.
-    throw new Error('USE_createBillWithFee'); // callers should use createBillWithFee
-  }
-
-  /** Create a bill with an explicit fee (fee comes from DoctorService). */
+  /**
+   * Create a bill for an appointment with an explicit fee.
+   * The fee comes from the doctor record (fetched by BookingFacade or the route).
+   * Applies the correct discount strategy based on patient type.
+   */
   async createBillWithFee(
     appointmentId: string,
     patientId: string,
