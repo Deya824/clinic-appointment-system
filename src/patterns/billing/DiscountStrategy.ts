@@ -1,6 +1,6 @@
 /**
  * PATTERN: Strategy
- * WHY: Discount calculation varies by patient type (regular / senior / insured).
+ * WHY: Discount calculation varies by patient type (regular / senior / insured / staff).
  *      Instead of a big if/else in BillingService, each rule is its own class.
  *      A registry maps patient type → strategy, so adding a new type only
  *      requires a new class and one registry entry.
@@ -32,11 +32,19 @@ export class InsuranceDiscount implements DiscountStrategy {
   }
 }
 
+/** Staff members get 30% off. */
+export class StaffDiscount implements DiscountStrategy {
+  calculate(fee: number): number {
+    return Math.round(fee * 0.30);
+  }
+}
+
 /** Registry: maps patient type string → strategy instance. */
 export const discountRegistry: Record<string, DiscountStrategy> = {
   regular:  new NoDiscount(),
   senior:   new SeniorDiscount(),
   insured:  new InsuranceDiscount(),
+  staff:    new StaffDiscount(),
 };
 
 /** Returns the strategy for a given patient type, defaulting to NoDiscount. */
