@@ -37,6 +37,9 @@ export class DoctorService {
 
   async addSchedule(input: CreateScheduleInput): Promise<Schedule> {
     if (input.startTime >= input.endTime) throw new Error('INVALID_SCHEDULE_TIME');
-    return this.schedules.create(input);
+   return this.schedules.create({
+  ...input,
+  dayOfWeek: input.dayOfWeek as Schedule['dayOfWeek'],
+});
   }
 }
