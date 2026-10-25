@@ -15,15 +15,21 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>
-        <nav>
-          <span style={{ fontWeight: 700, fontSize: '1.1rem', marginRight: 8 }}>🏥 Clinic</span>
-          <Link href="/dashboard">Dashboard</Link>
-          <Link href="/patients">Patients</Link>
-          <Link href="/book">Book</Link>
-          <Link href="/billing">Billing</Link>
-          <Link href="/api-docs" target="_blank">API Docs</Link>
-          <span style={{ flex: 1 }} />
-          <Link href="/login">Login</Link>
+        <nav className="site-nav">
+          <div className="site-nav-inner">
+            <Link href="/" className="site-brand">
+              <span className="brand-mark sm">🏥</span>
+              Clinic
+            </Link>
+            <div className="site-links">
+              <Link href="/dashboard">Dashboard</Link>
+              <Link href="/patients">Patients</Link>
+              <Link href="/book">Book</Link>
+              <Link href="/billing">Billing</Link>
+              <Link href="/api-docs" target="_blank">API Docs ↗</Link>
+            </div>
+            <Link href="/login" className="site-cta">Login</Link>
+          </div>
         </nav>
         {children}
       </body>

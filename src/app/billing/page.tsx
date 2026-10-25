@@ -89,65 +89,72 @@ export default function BillingPage() {
 
   return (
     <div className="page">
-      <h1>Billing</h1>
+      <header className="page-header">
+        <h1>Billing</h1>
+        <p>Generate a bill for an appointment and record payments.</p>
+      </header>
 
-      {/* Create Bill */}
-      <div className="card">
-        <h2>Create Bill</h2>
-        <form onSubmit={handleCreate}>
-          <label htmlFor="appt-id">Appointment ID</label>
-          <input id="appt-id" value={apptId} onChange={(e) => setApptId(e.target.value)} required />
+      <div className="cols">
+        {/* Create Bill */}
+        <div className="card">
+          <h2 className="card-title"><span className="dot">1</span>Create bill</h2>
+          <form onSubmit={handleCreate}>
+            <label htmlFor="appt-id">Appointment ID</label>
+            <input id="appt-id" value={apptId} onChange={(e) => setApptId(e.target.value)} required />
 
-          <label htmlFor="patient-id">Patient ID</label>
-          <input id="patient-id" value={patientId} onChange={(e) => setPatientId(e.target.value)} required />
+            <label htmlFor="patient-id">Patient ID</label>
+            <input id="patient-id" value={patientId} onChange={(e) => setPatientId(e.target.value)} required />
 
-          <label htmlFor="doctor-id">Doctor ID</label>
-          <input id="doctor-id" value={doctorId} onChange={(e) => setDoctorId(e.target.value)} required />
+            <label htmlFor="doctor-id">Doctor ID</label>
+            <input id="doctor-id" value={doctorId} onChange={(e) => setDoctorId(e.target.value)} required />
 
-          <button id="create-bill-btn" type="submit" disabled={creating}>
-            {creating ? 'Creating…' : 'Create Bill'}
-          </button>
-        </form>
-        {createMsg && (
-          <p id="create-msg" className={`msg ${createOk ? 'ok' : 'error'}`}>{createMsg}</p>
-        )}
-        {newBill && (
-          <table style={{ marginTop: 12 }}>
-            <tbody>
-              <tr><th>Bill ID</th><td>{newBill.id}</td></tr>
-              <tr><th>Amount</th><td>৳{newBill.amount}</td></tr>
-              <tr><th>Discount</th><td>৳{newBill.discount}</td></tr>
-              <tr><th>Status</th><td>{newBill.paymentStatus}</td></tr>
-            </tbody>
-          </table>
-        )}
-      </div>
+            <button id="create-bill-btn" type="submit" className="btn-block" disabled={creating}>
+              {creating ? 'Creating…' : 'Create Bill'}
+            </button>
+          </form>
+          {createMsg && (
+            <p id="create-msg" className={`msg ${createOk ? 'ok' : 'error'}`}>{createMsg}</p>
+          )}
+          {newBill && (
+            <div className="table-wrap" style={{ marginTop: 16 }}>
+              <table>
+                <tbody>
+                  <tr><th>Bill ID</th><td className="mono">{newBill.id}</td></tr>
+                  <tr><th>Amount</th><td>৳{newBill.amount}</td></tr>
+                  <tr><th>Discount</th><td>৳{newBill.discount}</td></tr>
+                  <tr><th>Status</th><td><span className={`badge ${newBill.paymentStatus}`}>{newBill.paymentStatus}</span></td></tr>
+                </tbody>
+              </table>
+            </div>
+          )}
+        </div>
 
-      {/* Pay Bill */}
-      <div className="card">
-        <h2>Pay Bill</h2>
-        <form onSubmit={handlePay}>
-          <label htmlFor="bill-id">Bill ID</label>
-          <input id="bill-id" value={billId} onChange={(e) => setBillId(e.target.value)} required />
+        {/* Pay Bill */}
+        <div className="card">
+          <h2 className="card-title"><span className="dot">2</span>Pay bill</h2>
+          <form onSubmit={handlePay}>
+            <label htmlFor="bill-id">Bill ID</label>
+            <input id="bill-id" value={billId} onChange={(e) => setBillId(e.target.value)} required />
 
-          <label htmlFor="pay-amount">Amount (৳)</label>
-          <input
-            id="pay-amount"
-            type="number"
-            min="1"
-            step="0.01"
-            value={amount}
-            onChange={(e) => setAmount(e.target.value)}
-            required
-          />
+            <label htmlFor="pay-amount">Amount (৳)</label>
+            <input
+              id="pay-amount"
+              type="number"
+              min="1"
+              step="0.01"
+              value={amount}
+              onChange={(e) => setAmount(e.target.value)}
+              required
+            />
 
-          <button id="pay-btn" type="submit" disabled={paying}>
-            {paying ? 'Processing…' : 'Pay Now'}
-          </button>
-        </form>
-        {payMsg && (
-          <p id="msg" className={`msg ${payOk ? 'ok' : 'error'}`}>{payMsg}</p>
-        )}
+            <button id="pay-btn" type="submit" className="btn-block" disabled={paying}>
+              {paying ? 'Processing…' : 'Pay Now'}
+            </button>
+          </form>
+          {payMsg && (
+            <p id="msg" className={`msg ${payOk ? 'ok' : 'error'}`}>{payMsg}</p>
+          )}
+        </div>
       </div>
     </div>
   );
