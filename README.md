@@ -2,7 +2,7 @@
 
 [![CI](https://github.com/Deya824/clinic-appointment-system/actions/workflows/ci.yml/badge.svg)](https://github.com/Deya824/clinic-appointment-system/actions/workflows/ci.yml)
 
-> **In simple words:** a web app where a clinic can register patients, add doctors, book appointments, and bill patients. Author: Deya (2203057).
+> **In simple words:** a web app where a clinic can register patients, add doctors, book appointments, and bill patients. Course: CSE 3206 Software Engineering Sessional, RUET.
 
 This is a university sessional project (CSE 3206). It is a full-stack web application built with Next.js.
 
