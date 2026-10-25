@@ -1,0 +1,206 @@
+@startuml Clinic Appointment & Billing System
+
+title Clinic Appointment & Billing System — Class Diagram
+
+skinparam classAttributeIconSize 0
+skinparam packageStyle rectangle
+skinparam linetype ortho
+
+' ══════════════════════════════════════════════════
+' INTERFACES (Repository contracts)
+' ══════════════════════════════════════════════════
+package "Repository Interfaces" {
+  interface IUserRepository {
+    +findByEmail(email): User|null
+    +findById(id): User|null
+    +create(data): User
+  }
+  interface IPatientRepository {
+    +findById(id): Patient|null
+    +findByPhone(phone): Patient|null
+    +search(query): Patient[]
+    +create(data): Patient
+    +update(id, data): Patient
+    +list(): Patient[]
+  }
+  interface IDoctorRepository {
+    +findById(id): Doctor|null
+    +list(): Doctor[]
+    +create(data): Doctor
+    +update(id, data): Doctor
+  }
+  interface IScheduleRepository {
+    +findByDoctor(doctorId): Schedule[]
+    +create(data): Schedule
+  }
+  interface IAppointmentRepository {
+    +findById(id): Appointment|null
+    +findOverlapping(...): Appointment[]
+    +findByDoctor(doctorId, date): Appointment[]
+    +create(data): Appointment
+    +updateStatus(id, status, start?, end?): Appointment
+  }
+  interface IBillRepository {
+    +findById(id): Bill|null
+    +findByAppointment(apptId): Bill|null
+    +create(data): Bill
+    +markPaid(id, ref): Bill
+  }
+}
+
+' ══════════════════════════════════════════════════
+' FIRESTORE REPOSITORIES (implement interfaces)
+' ══════════════════════════════════════════════════
+package "Firestore Repositories" {
+  class FirestoreUserRepo        implements IUserRepository
+  class FirestorePatientRepo     implements IPatientRepository
+  class FirestoreDoctorRepo      implements IDoctorRepository
+  class FirestoreScheduleRepo    implements IScheduleRepository
+  class FirestoreAppointmentRepo implements IAppointmentRepository
+  class FirestoreBillRepo        implements IBillRepository
+}
+
+' ══════════════════════════════════════════════════
+' SERVICES
+' ══════════════════════════════════════════════════
+package "Services" {
+  class AuthService {
+    -users: IUserRepository
+    +login(email, password): string (JWT)
+    +me(token): JwtPayload
+    +createUser(data): User
+  }
+  class PatientService {
+    -patients: IPatientRepository
+    +register(input): Patient
+    +search(query): Patient[]
+    +getById(id): Patient
+    +update(id, input): Patient
+  }
+  class DoctorService {
+    -doctors: IDoctorRepository
+    -schedules: IScheduleRepository
+    +list(): Doctor[]
+    +getById(id): Doctor
+    +create(input): Doctor
+    +getSchedule(doctorId): Schedule[]
+    +addSchedule(input): Schedule
+  }
+  class AppointmentService {
+    -appointments: IAppointmentRepository
+    -bus: EventBus
+    +book(input): Appointment
+    +cancel(id): Appointment
+    +reschedule(id, input): Appointment
+    +todayByDoctor(doctorId): Appointment[]
+  }
+  class BillingService {
+    -bills: IBillRepository
+    -patients: IPatientRepository
+    -gateway: PaymentGateway
+    +createBillWithFee(apptId, patientId, fee): Bill
+    +pay(billId, amount): Bill
+    +getBill(billId): Bill
+  }
+}
+
+AuthService        --> IUserRepository
+PatientService     --> IPatientRepository
+DoctorService      --> IDoctorRepository
+DoctorService      --> IScheduleRepository
+AppointmentService --> IAppointmentRepository
+BillingService     --> IBillRepository
+BillingService     --> IPatientRepository
+
+' ══════════════════════════════════════════════════
+' PATTERN 1 — Singleton (db.ts)
+' ══════════════════════════════════════════════════
+package "Pattern: Singleton" {
+  class FirestoreDB <<Singleton>> {
+    -db: Firestore {static}
+    +getDb(): Firestore {static}
+  }
+}
+FirestoreUserRepo        --> FirestoreDB
+FirestorePatientRepo     --> FirestoreDB
+FirestoreDoctorRepo      --> FirestoreDB
+FirestoreScheduleRepo    --> FirestoreDB
+FirestoreAppointmentRepo --> FirestoreDB
+FirestoreBillRepo        --> FirestoreDB
+
+' ══════════════════════════════════════════════════
+' PATTERN 2 — Factory Method (NotificationFactory)
+' ══════════════════════════════════════════════════
+package "Pattern: Factory Method" {
+  interface Notifier {
+    +send(to, message): void
+  }
+  class EmailNotifier    implements Notifier
+  class SmsNotifier      implements Notifier
+  class WhatsAppNotifier implements Notifier
+  class NotificationFactory <<Factory>> {
+    +create(channel): Notifier {static}
+  }
+  NotificationFactory ..> Notifier : creates
+}
+
+' ══════════════════════════════════════════════════
+' PATTERN 3 — Adapter (PaymentGateway)
+' ══════════════════════════════════════════════════
+package "Pattern: Adapter" {
+  interface PaymentGateway {
+    +charge(amount, ref): PaymentResult
+  }
+  class BkashClient {
+    +executePayment(payload): BkashResponse
+  }
+  class BkashAdapter implements PaymentGateway {
+    -client: BkashClient
+  }
+  class FakeGateway implements PaymentGateway
+  BkashAdapter --> BkashClient : wraps
+}
+BillingService --> PaymentGateway
+
+' ══════════════════════════════════════════════════
+' PATTERN 4 — Strategy (DiscountStrategy)
+' ══════════════════════════════════════════════════
+package "Pattern: Strategy" {
+  interface DiscountStrategy {
+    +calculate(fee): number
+  }
+  class NoDiscount       implements DiscountStrategy
+  class SeniorDiscount   implements DiscountStrategy
+  class InsuranceDiscount implements DiscountStrategy
+  class StaffDiscount    implements DiscountStrategy
+}
+BillingService --> DiscountStrategy : uses
+
+' ══════════════════════════════════════════════════
+' PATTERN 5 — Observer (EventBus)
+' ══════════════════════════════════════════════════
+package "Pattern: Observer" {
+  class EventBus <<Subject>> {
+    -listeners: Map
+    +on(event, handler): void
+    +emit(event, payload): void
+  }
+}
+AppointmentService --> EventBus : emits
+
+' ══════════════════════════════════════════════════
+' PATTERN 6 — Facade (BookingFacade)
+' ══════════════════════════════════════════════════
+package "Pattern: Facade" {
+  class BookingFacade <<Facade>> {
+    -apptService: AppointmentService
+    -billingService: BillingService
+    -doctorService: DoctorService
+    +bookAndBill(input): {appointment, bill}
+  }
+}
+BookingFacade --> AppointmentService
+BookingFacade --> BillingService
+BookingFacade --> DoctorService
+
+@enduml
