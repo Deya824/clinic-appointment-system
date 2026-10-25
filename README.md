@@ -2,7 +2,7 @@
 
 [![CI](https://github.com/Deya824/clinic-appointment-system/actions/workflows/ci.yml/badge.svg)](https://github.com/Deya824/clinic-appointment-system/actions/workflows/ci.yml)
 
-> **In simple words:** A web app that lets clinic staff book patient appointments, manage doctors, and handle billing — all from a browser.
+> **In simple words:** a web app where a clinic can register patients, add doctors, book appointments, and bill patients. Author: Deya (2203057).
 
 This is a university sessional project (CSE 3206). It is a full-stack web application built with Next.js.
 
