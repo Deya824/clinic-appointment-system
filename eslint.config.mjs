@@ -12,7 +12,10 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // Generated test coverage report, not our code
+    "coverage/**",
   ]),
 ]);
 
 export default eslintConfig;
+
