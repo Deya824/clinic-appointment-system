@@ -54,10 +54,14 @@ class NoDiscount
 class SeniorDiscount
 class InsuranceDiscount
 class StaffDiscount
+class DiscountRegistry <<registry>> {
+  +getDiscount(patientType)
+}
 DiscountStrategy <|.. NoDiscount
 DiscountStrategy <|.. SeniorDiscount
 DiscountStrategy <|.. InsuranceDiscount
 DiscountStrategy <|.. StaffDiscount
+DiscountRegistry ..> DiscountStrategy : returns the right one
 
 ' ---- 5. Adapter ----
 interface PaymentGateway {
@@ -73,8 +77,9 @@ BkashAdapter --> BkashClient : wraps
 class BillingService {
   +createBillWithFee()
   +pay()
+  +getBill()
 }
-BillingService --> DiscountStrategy : uses
+BillingService --> DiscountRegistry : asks for discount
 BillingService --> PaymentGateway : uses
 
 ' ---- 6. Facade ----
