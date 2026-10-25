@@ -62,27 +62,37 @@ export default function BookPage() {
   }
 
   return (
-    <div className="page" style={{ maxWidth: 500 }}>
-      <h1>Book Appointment</h1>
-      <div className="card">
-        <form onSubmit={handleBook}>
-          <label htmlFor="patient-id">Patient ID</label>
-          <input
-            id="patient-id"
-            value={patientId}
-            onChange={(e) => setPatientId(e.target.value)}
-            placeholder="e.g. abc123"
-            required
-          />
+    <div className="page" style={{ maxWidth: 720 }}>
+      <header className="page-header">
+        <h1>Book Appointment</h1>
+        <p>Reserve a time slot for a patient with a doctor.</p>
+      </header>
 
-          <label htmlFor="doctor-id">Doctor ID</label>
-          <input
-            id="doctor-id"
-            value={doctorId}
-            onChange={(e) => setDoctorId(e.target.value)}
-            placeholder="e.g. def456"
-            required
-          />
+      <div className="card">
+        <h2 className="card-title"><span className="dot">1</span>Appointment details</h2>
+        <form onSubmit={handleBook}>
+          <div className="grid2">
+            <div>
+              <label htmlFor="patient-id">Patient ID</label>
+              <input
+                id="patient-id"
+                value={patientId}
+                onChange={(e) => setPatientId(e.target.value)}
+                placeholder="e.g. abc123"
+                required
+              />
+            </div>
+            <div>
+              <label htmlFor="doctor-id">Doctor ID</label>
+              <input
+                id="doctor-id"
+                value={doctorId}
+                onChange={(e) => setDoctorId(e.target.value)}
+                placeholder="e.g. def456"
+                required
+              />
+            </div>
+          </div>
 
           <div className="grid2">
             <div>
@@ -93,7 +103,6 @@ export default function BookPage() {
                 value={start}
                 onChange={(e) => setStart(e.target.value)}
                 required
-                style={{ marginBottom: 0 }}
               />
             </div>
             <div>
@@ -104,12 +113,11 @@ export default function BookPage() {
                 value={end}
                 onChange={(e) => setEnd(e.target.value)}
                 required
-                style={{ marginBottom: 0 }}
               />
             </div>
           </div>
 
-          <button id="book-btn" type="submit" disabled={loading} style={{ marginTop: 12, width: '100%' }}>
+          <button id="book-btn" type="submit" className="btn-block" disabled={loading}>
             {loading ? 'Booking…' : 'Book Appointment'}
           </button>
         </form>

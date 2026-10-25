@@ -36,15 +36,19 @@ export default function DashboardPage() {
 
   return (
     <div className="page">
-      <h1>Today&apos;s Appointments</h1>
+      <header className="page-header">
+        <h1>Today&apos;s Appointments</h1>
+        <p>Look up a doctor&apos;s schedule for the day.</p>
+      </header>
+
       <div className="card">
+        <h2 className="card-title"><span className="dot">⌕</span>Find schedule</h2>
         <form onSubmit={fetchToday} className="row">
           <input
             id="doctor-id"
             value={doctorId}
             onChange={(e) => setDoctorId(e.target.value)}
             placeholder="Doctor ID"
-            style={{ marginBottom: 0 }}
           />
           <button id="fetch-btn" type="submit" disabled={loading}>
             {loading ? 'Loading…' : 'Load'}
@@ -54,32 +58,37 @@ export default function DashboardPage() {
       </div>
 
       {appointments.length > 0 && (
-        <table>
-          <thead>
-            <tr>
-              <th>ID</th>
-              <th>Patient</th>
-              <th>Start</th>
-              <th>End</th>
-              <th>Status</th>
-            </tr>
-          </thead>
-          <tbody>
-            {appointments.map((a) => (
-              <tr key={a.id}>
-                <td>{a.id}</td>
-                <td>{a.patientId}</td>
-                <td>{new Date(a.start).toLocaleTimeString()}</td>
-                <td>{new Date(a.end).toLocaleTimeString()}</td>
-                <td>{a.status}</td>
+        <div className="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Patient</th>
+                <th>Start</th>
+                <th>End</th>
+                <th>Status</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {appointments.map((a) => (
+                <tr key={a.id}>
+                  <td className="mono">{a.id}</td>
+                  <td className="mono">{a.patientId}</td>
+                  <td>{new Date(a.start).toLocaleTimeString()}</td>
+                  <td>{new Date(a.end).toLocaleTimeString()}</td>
+                  <td><span className={`badge ${a.status}`}>{a.status}</span></td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       )}
 
       {appointments.length === 0 && !msg && !loading && (
-        <p style={{ color: 'var(--muted)', marginTop: 16 }}>No appointments loaded yet.</p>
+        <div className="empty">
+          <strong>No appointments loaded yet</strong>
+          Enter a doctor ID above to see their schedule.
+        </div>
       )}
     </div>
   );
